@@ -140,39 +140,39 @@ st.markdown("""
         border: none !important;
     }
 
-    /* --- 针对移动设备 (iOS/WeChat) 的特别修复 --- */
+    /* --- 核心优化：针对移动设备 (iPhone 17 Pro Max / WeChat) --- */
     @media (max-width: 768px) {
-        /* 1. 强制主内容区全宽，消除左侧奇怪的留白 */
+        /* 1. 强制主内容区全宽，增加顶部安全间距，防止微信标题栏遮挡 */
         .block-container {
-            padding-top: 4rem !important;
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-            padding-bottom: 3rem !important;
+            padding-top: 5rem !important; 
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+            padding-bottom: 5rem !important;
             max-width: 100vw !important;
         }
 
-        /* 2. 修复侧边栏展开时的宽度 - 调整为更窄的抽屉模式 */
+        /* 2. 侧边栏优化：在超大屏 iPhone 上稍微变宽一点，更易操作 */
         section[data-testid="stSidebar"] {
-            width: 60vw !important; /* 占比由 85% 降至 60%，留出点击关闭的空间 */
-            min-width: 240px !important; /* 保证卡片能显示完整即可 */
-            box-shadow: 5px 0 20px rgba(0,0,0,0.15) !important; /* 增加阴影体现层次感 */
+            width: 75vw !important;
+            min-width: 280px !important;
         }
 
-        /* 3. 调整标题大小，防止换行太难看 */
-        h1 { font-size: 1.6rem !important; }
-        h2 { font-size: 1.4rem !important; }
-        
-        /* 4. 强制隐藏可能导致溢出的元素 */
-        iframe { max-width: 100% !important; }
-        
-        /* 5. 侧边栏内的卡片间距极度紧凑 */
-        div[data-testid="stRadio"] > div {
-            gap: 6px !important;
+        /* 3. 增大所有交互按钮的点击面积 (Fat Finger Friendly) */
+        div.stButton > button {
+            height: 56px !important;
+            font-size: 18px !important;
         }
+
+        /* 4. Radio 卡片自适应：在小屏上堆叠，在大屏上并排 */
         div[data-testid="stRadio"] label {
-            padding: 10px 14px !important;
-            font-size: 14px !important;
+            padding: 16px !important;
+            font-size: 16px !important;
+            margin-bottom: 4px !important;
         }
+        
+        /* 5. 隐藏 Streamlit 自带的底部装饰条，留出更多可视空间 */
+        footer { visibility: hidden; }
+        #MainMenu { visibility: hidden; }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -440,7 +440,7 @@ elif mode == "📝 领导公务单自动生成器":
                     "duration": dr, "place": pl, "num": nm, "contact": ct, 
                     "projector": pj, "dist_leader": dist_l, "bur_leader": bur_l, "others": oth
                 }
-                tpl = DocxTemplate("申报单模板.docx")
+                tpl = DocxTemplate("template.docx")
                 tpl.render(final_data)
                 bio = io.BytesIO()
                 tpl.save(bio)
@@ -497,9 +497,9 @@ elif mode == "🔍 龙华学校查号台":
     @st.cache_data
     def load_contacts():
         try:
-            return pd.read_csv('龙华中小学校通讯录（含幼儿园）.csv', encoding='utf-8-sig').fillna('无')
+            return pd.read_csv('contacts.csv', encoding='utf-8-sig').fillna('无')
         except:
-            return pd.read_csv('龙华中小学校通讯录（含幼儿园）.csv', encoding='gbk').fillna('无')
+            return pd.read_csv('contacts.csv', encoding='gbk').fillna('无')
 
     df = load_contacts()
     
